@@ -2,5 +2,3 @@ requests
 urllib3
 beautifulsoup4
 python-dotenv
-python-telegram-bot
-schedule
