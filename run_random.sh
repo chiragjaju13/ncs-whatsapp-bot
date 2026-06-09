@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Define execution path anchors
-TARGET_DIR="Desktop/whatsapp_tender_bot"
+TARGET_DIR="Desktop/bot_1"
 cd "$TARGET_DIR" || exit 1
 
 # Activate the local virtual python sandbox environment
