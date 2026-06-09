@@ -1,1 +1,1 @@
-0 9 * * * /bin/bash /home/Desktop/whatsapp_tender_bot/run_random.sh
+0 8 * * * /bin/bash /home/Desktop/whatsapp_tender_bot/run_random.sh
