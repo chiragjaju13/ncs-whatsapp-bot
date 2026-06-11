@@ -319,6 +319,7 @@ def job():
     archive_dict = load_archive()
     new_found_this_run = {}
     sent_in_this_run = set()
+    msedcl_sent = False
 
     # 1. Run MSEDCL Core Extraction
     msedcl_pending = {}
@@ -336,12 +337,38 @@ def job():
         
         for t_id, new_date, msg in unique_tenders:
             if send_whatsapp(msg, WA_GROUP_MSEDCL):
+                msedcl_sent = True
                 new_found_this_run[t_id] = new_date
                 sent_in_this_run.add(t_id)
                 print(f"✅ Transmitted to MSEDCL Group: {t_id}")
                 apply_global_delay()
             else:
                 print(f"❌ Transmission Dropped MSEDCL: {t_id}")
+
+    # --------------------------------------------------
+    # Random pause between MSEDCL and Mahatenders
+    # Only if at least one MSEDCL tender was sent
+    # --------------------------------------------------
+    if msedcl_sent:
+        break_time = random.randint(600, 1200)  # 10-20 minutes
+
+        mins = break_time // 60
+        secs = break_time % 60
+
+        print("\n⏸️ MSEDCL batch completed.")
+        print(
+            f"🕒 Waiting {mins} minutes {secs} seconds "
+            f"before starting Mahatenders..."
+        )
+
+        time.sleep(break_time)
+
+        print("▶️ Starting Mahatenders processing...\n")
+    else:
+        print(
+            "\nℹ️ No MSEDCL tenders were sent. "
+            "Skipping inter-batch waiting period.\n"
+        )
 
     # 2. Run Mahatenders Core Extraction
     mahatenders_pending = {}
