@@ -44,6 +44,21 @@ class DualLogger(object):
         self.terminal.flush()
         self.log.flush()
 
+# ============================================================
+# MSEDCL DISTRICT / TALUKA DATA
+# ============================================================
+#
+# IMPORTANT:
+# This list is ONLY for MSEDCL.
+#
+# If a MSEDCL tender does not match any district/taluka below,
+# it will automatically go into:
+#
+#     OTHER_STATE_WIDE
+#
+# Do NOT add OTHER_STATE_WIDE to this dictionary.
+# ============================================================
+
 MSEDCL_DISTRICT_DATA = {
     "Amravati": ["Amravati", "Bhatkuli", "Nandgaon Khandeshwar", "Dhamangaon Railway", "Chandur Railway", "Tiwsa", "Morshi", "Warud", "Achalpur", "Chandur Bazar", "Daryapur", "Anjangaon Surji", "Dharni", "Chikhaldara", "amt", "ach", "mor"],
     "Akola": ["Akola", "Akot", "Telhara", "Balapur", "Patur", "Barshitakli", "Murtijapur"],
@@ -92,7 +107,7 @@ MAHATENDERS_GROUP_2 = {
 
 # --- AUXILIARY HELPERS ---
 def apply_global_delay():
-    delay = random.randint(40, 120)
+    delay = random.randint(40, 100)
     print(f"⏳ Waiting {delay} seconds before next message to avoid spam filters...")
     time.sleep(delay)
 
