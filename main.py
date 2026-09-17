@@ -20,6 +20,7 @@ EVOLUTION_API_KEY = os.getenv("EVOLUTION_API_KEY")
 EVOLUTION_INSTANCE = os.getenv("EVOLUTION_INSTANCE")
 WA_GROUP_MSEDCL = os.getenv("WA_GROUP_MSEDCL")
 WA_GROUP_MAHATENDERS = os.getenv("WA_GROUP_MAHATENDERS")
+WA_GROUP_MAHATENDERS_2 = os.getenv("WA_GROUP_MAHATENDERS_2")
 
 MSEDCL_API_URL = "https://etender.mahadiscom.in/eatApp/getTahdrTypeCode/WT"
 MAHATENDERS_BASE_URL = "https://mahatenders.gov.in/nicgep/app"
