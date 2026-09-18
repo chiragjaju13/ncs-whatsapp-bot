@@ -45,12 +45,15 @@ class DualLogger(object):
         self.log.flush()
 
 
-# If a MSEDCL tender does not match any district/taluka below,
-# it will automatically go into:
-#
-#     OTHER_STATE_WIDE
-#
-# Do NOT add OTHER_STATE_WIDE to this dictionary.
+# MSEDCL DISTRICT CONFIGURATION
+# IMPORTANT:
+# 1. Only districts present in MSEDCL_DISTRICT_DATA will
+#    receive normal district messages.
+# 2. Districts present in MSEDCL_DISABLED_DISTRICT_DATA are
+#    recognized but intentionally ignored.
+# 3. Any tender which matches neither active nor disabled
+#    districts goes to OTHER_STATE_WIDE.
+# 4. Do NOT add OTHER_STATE_WIDE to either dictionary.
 
 MSEDCL_DISTRICT_DATA = {
     "Amravati": ["Amravati", "Bhatkuli", "Nandgaon Khandeshwar", "Dhamangaon Railway", "Chandur Railway", "Tiwsa", "Morshi", "Warud", "Achalpur", "Chandur Bazar", "Daryapur", "Anjangaon Surji", "Dharni", "Chikhaldara", "amt", "ach", "mor"],
@@ -70,45 +73,56 @@ MSEDCL_DISTRICT_DATA = {
     "Beed": ["Beed", "Georai", "Majalgaon", "Ambejogai", "Kaij", "Dharur", "Parli", "Patoda", "Ashti", "Gevrai", "Wadwani"],
     "Hingoli": ["Hingoli", "Sengaon", "Kalamnuri", "Basmath", "Aundha Nagnath"],
     "Parbhani": ["Parbhani", "Gangakhed", "Sonpeth", "Pathri", "Jintur", "Palam", "Purna", "Selu", "Manwath"],
-    "Jalna": ["Jalna", "Bhokardan", "Jafrabad", "Badnapur", "Ambad", "Ghansawangi", "Partur", "Mantha"],
+    "Jalna": ["Jalna", "Bhokardan", "Jafrabad", "Badnapur", "Ambad", "Ghansawangi", "Partur", "Mantha"]
+}
+
+# These districts are intentionally disabled.
+#
+# IMPORTANT:
+# Their tenders will NOT go to OTHER_STATE_WIDE.
+# They will simply be ignored.
+#
+# If you want one of these districts in future:
+# 1. Move/add it to MSEDCL_DISTRICT_DATA
+# 2. Remove it from this dictionary
+
+MSEDCL_DISABLED_DISTRICT_DATA = {
     
-    #"Akola": ["Akola", "Akot", "Telhara", "Balapur","Patur", "Barshitakli", "Murtijapur"],
+    "Chhatrapati Sambhajinagar": ["Chhatrapati Sambhajinagar", "Kannad", "Sillod","Soegaon", "Phulambri", "Khultabad","Vaijapur", "Gangapur", "Paithan"],
 
-    #"Chhatrapati Sambhajinagar": ["Chhatrapati Sambhajinagar", "Kannad", "Sillod","Soegaon", "Phulambri", "Khultabad","Vaijapur", "Gangapur", "Paithan"],
+    "Ahilyanagar": ["Ahilyanagar", "Akole", "Jamkhed", "Karjat","Kopargaon", "Nevasa", "Parner", "Pathardi","Rahata", "Rahuri", "Sangamner", "Shevgaon","Shrigonda", "Shrirampur"],
 
-    #"Ahilyanagar": ["Ahilyanagar", "Akole", "Jamkhed", "Karjat","Kopargaon", "Nevasa", "Parner", "Pathardi","Rahata", "Rahuri", "Sangamner", "Shevgaon","Shrigonda", "Shrirampur"],
+    "Dhule": ["Dhule", "Sakri", "Shirpur", "Shindkheda"],
 
-    #"Dhule": ["Dhule", "Sakri", "Shirpur", "Shindkheda"],
+    "Jalgaon": ["Jalgaon", "Amalner", "Bhadgaon", "Bhusawal","Bodwad", "Chalisgaon", "Chopda", "Dharangaon","Erandol", "Jamner", "Muktainagar", "Pachora","Parola", "Raver", "Yawal"],
 
-    #"Jalgaon": ["Jalgaon", "Amalner", "Bhadgaon", "Bhusawal","Bodwad", "Chalisgaon", "Chopda", "Dharangaon","Erandol", "Jamner", "Muktainagar", "Pachora","Parola", "Raver", "Yawal"],
+    "Nandurbar": ["Nandurbar", "Akkalkuwa", "Akrani", "Taloda","Shahada", "Navapur"],
 
-    #"Nandurbar": ["Nandurbar", "Akkalkuwa", "Akrani", "Taloda","Shahada", "Navapur"],
+    "Nashik": ["Nashik", "Igatpuri", "Trimbakeshwar", "Dindori","Peth", "Kalwan", "Surgana", "Chandwad","Deola", "Baglan", "Malegaon", "Nandgaon","Yeola", "Niphad", "Sinnar"],
 
-    #"Nashik": ["Nashik", "Igatpuri", "Trimbakeshwar", "Dindori","Peth", "Kalwan", "Surgana", "Chandwad","Deola", "Baglan", "Malegaon", "Nandgaon","Yeola", "Niphad", "Sinnar"],
+    "Mumbai City": ["Mumbai City"],
 
-    #"Mumbai City": ["Mumbai City"],
+    "Mumbai Suburban": ["Andheri", "Borivali", "Kurla"],
 
-    #"Mumbai Suburban": ["Andheri", "Borivali", "Kurla"],
+    "Thane": ["Thane", "Kalyan", "Murbad", "Bhiwandi","Shahapur", "Ulhasnagar", "Ambarnath"],
 
-    #"Thane": ["Thane", "Kalyan", "Murbad", "Bhiwandi","Shahapur", "Ulhasnagar", "Ambarnath"],
+    "Palghar": ["Palghar", "Dahanu", "Talasari", "Jawhar","Mokhada", "Wada", "Vikramgad", "Vasai"],
 
-    #"Palghar": ["Palghar", "Dahanu", "Talasari", "Jawhar","Mokhada", "Wada", "Vikramgad", "Vasai"],
+    "Raigad": ["Alibag", "Pen", "Panvel", "Uran","Karjat", "Khalapur", "Mahad", "Poladpur","Mangaon", "Roha", "Murud", "Shrivardhan","Mhasla", "Tala", "Sudhagad"],
 
-    #"Raigad": ["Alibag", "Pen", "Panvel", "Uran","Karjat", "Khalapur", "Mahad", "Poladpur","Mangaon", "Roha", "Murud", "Shrivardhan","Mhasla", "Tala", "Sudhagad"],
+    "Ratnagiri": ["Ratnagiri", "Chiplun", "Dapoli", "Guhagar","Khed", "Lanja", "Mandangad", "Rajapur","Sangameshwar"],
 
-    #"Ratnagiri": ["Ratnagiri", "Chiplun", "Dapoli", "Guhagar","Khed", "Lanja", "Mandangad", "Rajapur","Sangameshwar"],
+    "Sindhudurg": ["Kankavli", "Kudal", "Malvan", "Sawantwadi","Deogad", "Dodamarg", "Vengurla", "Vaibhavwadi"],
 
-    #"Sindhudurg": ["Kankavli", "Kudal", "Malvan", "Sawantwadi","Deogad", "Dodamarg", "Vengurla", "Vaibhavwadi"],
+    "Pune": ["Pune City", "Haveli", "Khed", "Junnar","Ambegaon", "Mawal", "Mulshi", "Shirur","Daund", "Purandhar", "Bhor", "Velhe","Baramati", "Indapur"],
 
-    #"Pune": ["Pune City", "Haveli", "Khed", "Junnar","Ambegaon", "Mawal", "Mulshi", "Shirur","Daund", "Purandhar", "Bhor", "Velhe","Baramati", "Indapur"],
+    "Satara": ["Satara", "Jaoli", "Karad", "Khandala","Khatav", "Koregaon", "Mahabaleshwar","Man", "Patan", "Phaltan", "Wai"],
 
-    #"Satara": ["Satara", "Jaoli", "Karad", "Khandala","Khatav", "Koregaon", "Mahabaleshwar","Man", "Patan", "Phaltan", "Wai"],
+    "Sangli": ["Sangli", "Miraj", "Tasgaon", "Kavathe Mahankal","Jat", "Khanapur", "Atpadi", "Palus","Walwa", "Shirala"],
 
-    #"Sangli": ["Sangli", "Miraj", "Tasgaon", "Kavathe Mahankal","Jat", "Khanapur", "Atpadi", "Palus","Walwa", "Shirala"],
+    "Solapur": ["Solapur North", "Solapur South", "Akkalkot","Barshi", "Karmala", "Madha", "Malshiras","Mangalvedhe", "Mohol", "Pandharpur", "Sangole"],
 
-    #"Solapur": ["Solapur North", "Solapur South", "Akkalkot","Barshi", "Karmala", "Madha", "Malshiras","Mangalvedhe", "Mohol", "Pandharpur", "Sangole"],
-
-    #"Kolhapur": ["Kolhapur", "Karvir", "Panhala", "Shahuwadi","Kagal", "Hatkanangale", "Shirol", "Radhanagari","Gaganbawada", "Bhudargad", "Ajra", "Chandgad","Gadhinglaj"],
+    "Kolhapur": ["Kolhapur", "Karvir", "Panhala", "Shahuwadi","Kagal", "Hatkanangale", "Shirol", "Radhanagari","Gaganbawada", "Bhudargad", "Ajra", "Chandgad","Gadhinglaj"],
 }
 
 MAHATENDERS_GROUP_1 = {
@@ -288,11 +302,25 @@ def check_msedcl(pending_msgs, archive):
                 if matched:
                     matched_district = d_name
                     break
-                    
+
+            disabled_districts = None
+            if not matched_district:
+                for d_name, talukas in MSEDCL_DISABLED_DISTRICT_DATA.items():
+                    matched, _ = get_matched_district_taluka(combined, d_name, talukas)
+                    if matched:
+                        disabled_districts = d_name
+                        break
+
+        
             # MSEDCL FALLBACK
             if matched_district:
                 pending_group = matched_district
                 display_division = matched_taluka
+
+            elif disabled_districts:
+                print(f"🚫 Skipping disabled MSEDCL district: {disabled_districts} | Tender: {t_no}")
+                continue
+            
             else:
                 pending_group = "OTHER_STATE_WIDE"
                 display_division = "OTHER_STATE_WIDE"
@@ -419,7 +447,7 @@ def job():
         if not unique_tenders: continue
         
         # Broadcast WhatsApp Group District Header
-        header = f"🏙️ *DISTRICT: {dist.upper()} (MSEDCL)*"
+        header = f"🏙️ *DISTRICT: {dist.upper()}" 
         print(header)
         send_whatsapp(header, WA_GROUP_MSEDCL)
         apply_global_delay()
