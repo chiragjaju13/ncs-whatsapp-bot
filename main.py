@@ -20,6 +20,7 @@ EVOLUTION_API_KEY = os.getenv("EVOLUTION_API_KEY")
 EVOLUTION_INSTANCE = os.getenv("EVOLUTION_INSTANCE")
 WA_GROUP_MSEDCL = os.getenv("WA_GROUP_MSEDCL")
 WA_GROUP_MAHATENDERS = os.getenv("WA_GROUP_MAHATENDERS")
+WA_GROUP_MAHATENDERS_2 = os.getenv("WA_GROUP_MAHATENDERS_2")
 
 MSEDCL_API_URL = "https://etender.mahadiscom.in/eatApp/getTahdrTypeCode/WT"
 MAHATENDERS_BASE_URL = "https://mahatenders.gov.in/nicgep/app"
@@ -43,7 +44,8 @@ class DualLogger(object):
         self.terminal.flush()
         self.log.flush()
 
-DISTRICT_DATA = {
+
+MSEDCL_DISTRICT_DATA = {
     "Amravati": ["Amravati", "Bhatkuli", "Nandgaon Khandeshwar", "Dhamangaon Railway", "Chandur Railway", "Tiwsa", "Morshi", "Warud", "Achalpur", "Chandur Bazar", "Daryapur", "Anjangaon Surji", "Dharni", "Chikhaldara", "amt", "ach", "mor"],
     "Akola": ["Akola", "Akot", "Telhara", "Balapur", "Patur", "Barshitakli", "Murtijapur"],
     "Washim": ["Washim", "Malegaon", "Risod", "Mangrulpir", "Karanja", "Manora"],
@@ -61,12 +63,74 @@ DISTRICT_DATA = {
     "Beed": ["Beed", "Georai", "Majalgaon", "Ambejogai", "Kaij", "Dharur", "Parli", "Patoda", "Ashti", "Gevrai", "Wadwani"],
     "Hingoli": ["Hingoli", "Sengaon", "Kalamnuri", "Basmath", "Aundha Nagnath"],
     "Parbhani": ["Parbhani", "Gangakhed", "Sonpeth", "Pathri", "Jintur", "Palam", "Purna", "Selu", "Manwath"],
-    "Jalna": ["Jalna", "Bhokardan", "Jafrabad", "Badnapur", "Ambad", "Ghansawangi", "Partur", "Mantha"]
+    "Jalna": ["Jalna", "Bhokardan", "Jafrabad", "Badnapur", "Ambad", "Ghansawangi", "Partur", "Mantha"],
+    "Chhatrapati Sambhajinagar": ["Chhatrapati Sambhajinagar", "Kannad", "Sillod","Soegaon", "Phulambri", "Khultabad","Vaijapur", "Gangapur", "Paithan"]
+
+    # "Ahilyanagar": ["Ahilyanagar", "Akole", "Jamkhed", "Karjat","Kopargaon", "Nevasa", "Parner", "Pathardi","Rahata", "Rahuri", "Sangamner", "Shevgaon","Shrigonda", "Shrirampur"],
+
+    # "Dhule": ["Dhule", "Sakri", "Shirpur", "Shindkheda"],
+
+    # "Jalgaon": ["Jalgaon", "Amalner", "Bhadgaon", "Bhusawal","Bodwad", "Chalisgaon", "Chopda", "Dharangaon","Erandol", "Jamner", "Muktainagar", "Pachora","Parola", "Raver", "Yawal"],
+
+    # "Nandurbar": ["Nandurbar", "Akkalkuwa", "Akrani", "Taloda","Shahada", "Navapur"],
+
+    # "Nashik": ["Nashik", "Igatpuri", "Trimbakeshwar", "Dindori","Peth", "Kalwan", "Surgana", "Chandwad","Deola", "Baglan", "Malegaon", "Nandgaon","Yeola", "Niphad", "Sinnar"],
+
+    # "Mumbai City": ["Mumbai City"],
+
+    # "Mumbai Suburban": ["Andheri", "Borivali", "Kurla"],
+
+    # "Thane": ["Thane", "Kalyan", "Murbad", "Bhiwandi","Shahapur", "Ulhasnagar", "Ambarnath"],
+
+    # "Palghar": ["Palghar", "Dahanu", "Talasari", "Jawhar","Mokhada", "Wada", "Vikramgad", "Vasai"],
+
+    # "Raigad": ["Alibag", "Pen", "Panvel", "Uran","Karjat", "Khalapur", "Mahad", "Poladpur","Mangaon", "Roha", "Murud", "Shrivardhan","Mhasla", "Tala", "Sudhagad"],
+
+    # "Ratnagiri": ["Ratnagiri", "Chiplun", "Dapoli", "Guhagar","Khed", "Lanja", "Mandangad", "Rajapur","Sangameshwar"],
+
+    # "Sindhudurg": ["Kankavli", "Kudal", "Malvan", "Sawantwadi","Deogad", "Dodamarg", "Vengurla", "Vaibhavwadi"],
+
+    # "Pune": ["Pune City", "Haveli", "Khed", "Junnar","Ambegaon", "Mawal", "Mulshi", "Shirur","Daund", "Purandhar", "Bhor", "Velhe","Baramati", "Indapur"],
+
+    # "Satara": ["Satara", "Jaoli", "Karad", "Khandala","Khatav", "Koregaon", "Mahabaleshwar","Man", "Patan", "Phaltan", "Wai"],
+
+    # "Sangli": ["Sangli", "Miraj", "Tasgaon", "Kavathe Mahankal","Jat", "Khanapur", "Atpadi", "Palus","Walwa", "Shirala"],
+
+    # "Solapur": ["Solapur North", "Solapur South", "Akkalkot","Barshi", "Karmala", "Madha", "Malshiras","Mangalvedhe", "Mohol", "Pandharpur", "Sangole"],
+
+    # "Kolhapur": ["Kolhapur", "Karvir", "Panhala", "Shahuwadi","Kagal", "Hatkanangale", "Shirol", "Radhanagari","Gaganbawada", "Bhudargad", "Ajra", "Chandgad","Gadhinglaj"],
+}
+
+MAHATENDERS_GROUP_1 = {
+    "Amravati": ["Amravati", "Bhatkuli", "Nandgaon Khandeshwar", "Dhamangaon Railway", "Chandur Railway", "Tiwsa", "Morshi", "Warud", "Achalpur", "Chandur Bazar", "Daryapur", "Anjangaon Surji", "Dharni", "Chikhaldara", "amt", "ach", "mor"],
+    "Akola": ["Akola", "Akot", "Telhara", "Balapur", "Patur", "Barshitakli", "Murtijapur"],
+    "Washim": ["Washim", "Malegaon", "Risod", "Mangrulpir", "Karanja", "Manora"],
+    "Buldhana": ["Buldhana", "Chikhli", "Mehkar", "Sindkhed Raja", "Deulgaon Raja", "Lonar", "Khamgaon", "Shegaon", "Nandura", "Malkapur", "Motala", "Sangrampur", "Jalgaon Jamod", "bld", "mlp"],
+    "Yavatmal": ["Yavatmal", "Babhulgaon", "Kalamb", "Ralegaon", "Darwha", "Digras", "Ner", "Pusad", "Umarkhed", "Mahagaon", "Kelapur", "Pandharkawada", "Ghatanji", "Wani", "Maregaon", "Zari-Jamani","Dhanki", "ytl", "drw", "pkd", "psd"],
+    "Nagpur": ["Nagpur", "Nagpur Rural", "Kamptee", "Hingna", "Katol", "Narkhed", "Savner", "Kalmeshwar", "Ramtek", "Mouda", "Kuhi", "Umred", "Bhivapur", "Parseoni", "ngp", "ktl"],
+    "Wardha": ["Wardha", "Arvi", "Ashti", "Deoli", "Hinganghat", "Seloo", "Karanja", "Samudrapur", "wrd", "hgt", "arv"],
+    "Bhandara": ["Bhandara", "Mohadi", "Tumsar", "Pauni", "Sakoli", "Lakhani", "Lakhandur"],
+    "Gondia": ["Gondia", "Tirora", "Goregaon", "Amgaon", "Salekasa", "Deori", "Sadak Arjuni", "Arjuni Morgaon"],
+    "Chandrapur": ["Chandrapur", "Ballarpur", "Chimur", "Nagbhir", "Brahmapuri", "Sindewahi", "Mul", "Gondpipri", "Pombhurna", "Warora", "Bhadravati", "Korpana", "Rajura", "Jivati"],
+    "Gadchiroli": ["Gadchiroli", "Dhanora", "Chamorshi", "Mulchera", "Desaiganj", "Wadsa", "Armori", "Kurkheda", "Korchi", "Aheri", "Etapalli", "Sironcha", "Bhamragad"],
+
+}
+
+MAHATENDERS_GROUP_2 = {
+    "Latur": ["Latur", "Udgir", "Ahmedpur", "Nilanga", "Ausa", "Chakur", "Jalkot", "Renapur", "Deoni", "Shirur Anantpal"],
+    "Dharashiv": ["Dharashiv", "Tuljapur", "Umarga", "Lohara", "Kalamb", "Bhoom", "Paranda", "Washi"],
+    "Nanded": ["Nanded", "Ardhapur", "Mudkhed", "Bhokar", "Umri", "Dharmabad", "Biloli", "Naigaon", "Loha", "Kandhar", "Mukhed", "Deglur", "Hadgaon", "Himayatnagar", "Mahur", "Kinwat"],
+    "Beed": ["Beed", "Georai", "Majalgaon", "Ambejogai", "Kaij", "Dharur", "Parli", "Patoda", "Ashti", "Gevrai", "Wadwani"],
+    "Hingoli": ["Hingoli", "Sengaon", "Kalamnuri", "Basmath", "Aundha Nagnath"],
+    "Parbhani": ["Parbhani", "Gangakhed", "Sonpeth", "Pathri", "Jintur", "Palam", "Purna", "Selu", "Manwath"],
+    "Jalna": ["Jalna", "Bhokardan", "Jafrabad", "Badnapur", "Ambad", "Ghansawangi", "Partur", "Mantha"],
+    "Chhatrapati Sambhajinagar": ["Chhatrapati Sambhajinagar", "Kannad", "Sillod","Soegaon", "Phulambri", "Khultabad","Vaijapur", "Gangapur", "Paithan"]
+
 }
 
 # --- AUXILIARY HELPERS ---
 def apply_global_delay():
-    delay = random.randint(40, 120)
+    delay = random.randint(40, 90)
     print(f"⏳ Waiting {delay} seconds before next message to avoid spam filters...")
     time.sleep(delay)
 
@@ -206,28 +270,44 @@ def check_msedcl(pending_msgs, archive):
                 
             desc = item.get("description", "").strip()
             combined = (desc + " " + t_no).lower()
+
+            # MSEDCL DISTRICT MATCHING
+            matched_district = None
+            matched_taluka = None
             
-            for d_name, talukas in DISTRICT_DATA.items():
+            for d_name, talukas in MSEDCL_DISTRICT_DATA.items():
                 matched, matched_taluka = get_matched_district_taluka(combined, d_name, talukas)
                 if matched:
-                    tender_fee_raw = item.get("tahdrFees")
-                    tender_fee = "Not Specified" if tender_fee_raw is None else format_currency(float(tender_fee_raw) * 1.18)
-                    msg = (
-                        f"🏷️ Division: {matched_taluka}\n"
-                        f"🔢 Tender No: *{t_no}*\n"
-                        f"📝 Description: {desc}\n"
-                        f"📅 Purchase Start: {format_epoch(item.get('purchaseFromDate'))}\n"
-                        f"⌛ Purchase End: {format_epoch(item.get('purchaseToDate'))}\n"
-                        f"📤 Submission Day: {submission_date}\n"
-                        f"⚙️ Tech Bid Opening: {format_epoch(item.get('techBidOpenningDate'), include_time=True)}\n"
-                        f"💰 Tender Amount: {format_currency(item.get('estimatedCost'))}\n"
-                        f"💳 EMD Amount: {format_currency(item.get('emdFee'))}\n"
-                        f"📜 Tender Fees: {tender_fee}"
-                    )
-                    if is_updated:
-                        msg = f"🔄 *UPDATED / REFLOATED TENDER* 🔄\n_(Previous Date: {archive.get(t_no)})_\n\n" + msg
-                    pending_msgs.setdefault(d_name, []).append((t_no, submission_date, msg))
+                    matched_district = d_name
                     break
+       
+            if not matched_district:
+                print(f"Ignoring MSEDCL tender with no configured district match: {t_no}")
+                continue
+
+            pending_group = matched_district
+            display_division = matched_taluka
+
+
+            tender_fee_raw = item.get("tahdrFees")
+            tender_fee = "Not Specified" if tender_fee_raw is None else format_currency(float(tender_fee_raw) * 1.18)
+
+            msg = (
+                f"🏷️ Division: {display_division}\n"
+                f"🔢 Tender No: {t_no}\n"
+                f"📝 Description: {desc}\n"
+                f"📅 Purchase Start: {format_epoch(item.get('purchaseFromDate'))}\n"
+                f"⌛ Purchase End: {format_epoch(item.get('purchaseToDate'))}\n"
+                f"📤 Submission Day: {submission_date}\n"
+                f"⚙️ Tech Bid Opening: {format_epoch(item.get('techBidOpenningDate'), include_time=True)}\n"
+                f"💰 Tender Amount: {format_currency(item.get('estimatedCost'))}\n"
+                f"💳 EMD Amount: {format_currency(item.get('emdFee'))}\n"
+                f"📜 Tender Fees: {tender_fee}"
+            )
+            if is_updated:
+                msg = f"🔄 *UPDATED / REFLOATED TENDER* 🔄\n_(Previous Date: {archive.get(t_no)})_\n\n" + msg
+            pending_msgs.setdefault(pending_group, []).append((t_no, submission_date, msg))
+            
     except Exception as e: 
         print(f"❌ MSEDCL Engine Failure: {e}")
 
@@ -253,65 +333,165 @@ def fetch_mahatender_details(session, detail_url):
     except: return {'amount': 'Not Specified', 'fee': 'Not Specified', 'emd': 'Not Specified'}
 
 def check_mahatenders(pending_msgs, archive):
-    print(f"[{datetime.now(IST).strftime('%H:%M:%S')}] Initializing Mahatenders Form Injection Loop...")
+    print(f"[{time.strftime('%H:%M:%S')}] Checking Mahatenders Search...")
+
+    url = "https://mahatenders.gov.in/nicgep/app"
     s = requests.Session()
-    s.headers.update({'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/119.0'})
-    
+    s.headers.update({'User-Agent': 'Mozilla/5.0'})
+
+    # Prevent the same tender from being added multiple times
+    # when it appears in district and multiple taluka searches.
+    seen_tender_ids = set()
+
+    # Process one district completely before moving to the next.
     for dist_name, talukas in DISTRICT_DATA.items():
-        try:
-            r = s.get(MAHATENDERS_BASE_URL, verify=False, timeout=20)
-            soup = BeautifulSoup(r.text, 'html.parser')
-            form = soup.find('form', id='tenderSearch')
-            if not form: continue
-            
-            data = {inp.get('name'): inp.get('value', '') for inp in form.find_all('input') if inp.get('name')}
-            data['SearchDescription'] = dist_name
-            data['Go'] = 'Go'
-            
-            res = s.post("https://mahatenders.gov.in" + form.get('action'), data=data, verify=False, timeout=20)
-            res_soup = BeautifulSoup(res.text, 'html.parser')
-            table = res_soup.find('table', id='table')
-            if not table: continue
-            
-            for row in table.find_all('tr')[1:]:
-                cols = row.find_all('td')
-                if len(cols) < 6: continue
-                
-                title = cols[4].text.strip()
-                current_close_date = normalize_date_str(cols[2].text.strip())
-                
-                id_match = re.search(r'\d{4}_[A-Z]+_\d+_\d+', title)
-                t_id = id_match.group(0) if id_match else title[:50].strip()
-                is_updated = False
-                
-                if t_id in archive:
-                    if is_same_date(archive.get(t_id), current_close_date): 
+
+        print(f"\n{'='*50}")
+        print(f"🏙️ DISTRICT: {dist_name}")
+        print(f"{'='*50}")
+
+        # Search district first, followed by every taluka.
+        # dict.fromkeys removes duplicate search terms while
+        # preserving their original order.
+        search_terms = list(dict.fromkeys([dist_name] + talukas))
+
+        for search_term in search_terms:
+
+            print(f"🔍 Searching: {search_term}")
+
+            try:
+                r = s.get(url, verify=False, timeout=20)
+                soup = BeautifulSoup(r.text, 'html.parser')
+
+                form = soup.find('form', id='tenderSearch')
+                if not form:
+                    print(f"⚠️ Search form not found: {search_term}")
+                    continue
+
+                data = {
+                    inp.get('name'): inp.get('value', '')
+                    for inp in form.find_all('input')
+                    if inp.get('name')
+                }
+
+                data['SearchDescription'] = search_term
+                data['Go'] = 'Go'
+
+                res = s.post(
+                    "https://mahatenders.gov.in" + form.get('action'),
+                    data=data,
+                    verify=False,
+                    timeout=20
+                )
+
+                res_soup = BeautifulSoup(res.text, 'html.parser')
+                table = res_soup.find('table', id='table')
+
+                if not table:
+                    print(f"ℹ️ No results table: {search_term}")
+                    continue
+
+                for row in table.find_all('tr')[1:]:
+
+                    cols = row.find_all('td')
+                    if len(cols) < 6:
                         continue
-                    else: 
-                        is_updated = True
-                    
-                combined = title.lower()
-                matched, matched_taluka = get_matched_district_taluka(combined, dist_name, talukas)
-                if matched:
-                    extra = fetch_mahatender_details(s, cols[4].find('a').get('href'))
-                    msg = (
-                        f"🏷️ Division: {matched_taluka}\n"
-                        f"🔢 Tender ID: *{t_id}*\n"
-                        f"📝 Title: {title}\n"
-                        f"📅 Published Date: {normalize_date_str(cols[1].text.strip())}\n"
-                        f"⌛ Closing Date: {current_close_date}\n"
-                        f"⚙️ Opening Date: {normalize_date_str(cols[3].text.strip())}\n"
-                        f"💰 Tender Amount: {extra['amount']}\n"
-                        f"💳 EMD Amount: {extra['emd']}\n"
-                        f"📜 Tender Fee: {extra['fee']}\n"
-                        f"🏢 Organisation: {cols[5].text.strip()}"
+
+                    title = cols[4].text.strip()
+                    current_close_date = cols[2].text.strip()
+
+                    id_match = re.search(
+                        r'\d{4}\_[A-Z]+\_\d+\_\d+',
+                        title
                     )
-                    if is_updated:
-                        msg = f"🔄 *UPDATED / REFLOATED TENDER* 🔄\n_(Previous Date: {archive.get(t_id)})_\n\n" + msg
-                    pending_msgs.setdefault(dist_name, []).append((t_id, current_close_date, msg))
-        except Exception as e:
-            print(f"⚠️ Error pulling district {dist_name} from Mahatenders: {e}")
-            continue
+
+                    t_id = id_match.group(0) if id_match else title[:50]
+
+                    # Avoid duplicate tender entries across searches.
+                    if t_id in seen_tender_ids:
+                        continue
+
+                    # Existing archive checking logic
+                    is_updated = False
+
+                    if t_id in archive:
+                        if is_same_date(
+                            archive.get(t_id),
+                            current_close_date
+                        ):
+                            seen_tender_ids.add(t_id)
+                            continue
+                        else:
+                            is_updated = True
+
+                    # Existing district and taluka matching logic
+                    combined = title.lower()
+
+                    matched, matched_taluka = get_matched_district_taluka(
+                        combined,
+                        dist_name,
+                        talukas
+                    )
+
+                    if matched:
+
+                        link = cols[4].find('a')
+
+                        detail_url = (
+                            link.get('href')
+                            if link else None
+                        )
+
+                        extra = fetch_mahatender_details(
+                            s,
+                            detail_url
+                        )
+
+                        msg = (
+                            f"🏷️ Division: {matched_taluka}\n"
+                            f"🔢 Tender ID: `{t_id}`\n"
+                            f"📝 Title: {title}\n"
+                            f"📅 Published Date: {normalize_date_str(cols[1].text.strip())}\n"
+                            f"⌛ Closing Date: {normalize_date_str(current_close_date)}\n"
+                            f"⚙️ Opening Date: {normalize_date_str(cols[3].text.strip())}\n"
+                            f"💰 Tender Amount: {extra['amount']}\n"
+                            f"💳 EMD Amount: {extra['emd']}\n"
+                            f"📜 Tender Fee: {extra['fee']}\n"
+                            f"🏢 Organisation: {cols[5].text.strip()}"
+                        )
+
+                        if is_updated:
+                            msg = (
+                                f"🔄 **UPDATED / REFLOATED TENDER** 🔄\n"
+                                f"*(Previous Date: {archive.get(t_id)})*\n\n"
+                            ) + msg
+
+                        pending_msgs.setdefault(
+                            dist_name, []
+                        ).append(
+                            (
+                                t_id,
+                                current_close_date,
+                                msg,
+                                is_updated,
+                                title
+                            )
+                        )
+
+                        seen_tender_ids.add(t_id)
+
+                        print(f"✅ Tender Found: {t_id}")
+
+            except Exception as e:
+                print(
+                    f"❌ Error searching {search_term} "
+                    f"under {dist_name}: {e}"
+                )
+                continue
+
+        print(f"✅ Completed all searches for {dist_name}")
+
+    print("\n🏁 Completed all district and taluka searches.")
 
 # --- RUN ENGINE ---
 def job():
@@ -330,7 +510,7 @@ def job():
         if not unique_tenders: continue
         
         # Broadcast WhatsApp Group District Header
-        header = f"🏙️ *DISTRICT: {dist.upper()} (MSEDCL)*"
+        header = f"🏙️ *DISTRICT: {dist.upper()}*" 
         print(header)
         send_whatsapp(header, WA_GROUP_MSEDCL)
         apply_global_delay()
@@ -370,16 +550,16 @@ def job():
             "Skipping inter-batch waiting period.\n"
         )
 
-    # 2. Run Mahatenders Core Extraction
-    mahatenders_pending = {}
-    check_mahatenders(mahatenders_pending, {**archive_dict, **new_found_this_run})
+    # 2. Run Mahatenders Group 1
+    mahatenders_group_1_pending = {}
+    check_mahatenders(mahatenders_group_1_pending, {**archive_dict, **new_found_this_run}, MAHATENDERS_GROUP_1)
     
-    for dist, tenders in mahatenders_pending.items():
+    for dist, tenders in mahatenders_group_1_pending.items():
         unique_tenders = [t for t in tenders if t[0] not in sent_in_this_run]
         if not unique_tenders: continue
         
         # Broadcast WhatsApp Group District Header
-        header = f"🏙️ *DISTRICT: {dist.upper()} (MAHATENDERS)*"
+        header = f"🏙️ *DISTRICT: {dist.upper()}*"
         print(header)
         send_whatsapp(header, WA_GROUP_MAHATENDERS)
         apply_global_delay()
@@ -388,12 +568,35 @@ def job():
             if send_whatsapp(msg, WA_GROUP_MAHATENDERS):
                 new_found_this_run[t_id] = new_date
                 sent_in_this_run.add(t_id)
-                print(f"✅ Transmitted to Mahatenders Group: {t_id}")
+                print(f"✅ Transmitted to Mahatenders Group 1: {t_id}")
                 apply_global_delay()
             else:
-                print(f"❌ Transmission Dropped Mahatenders: {t_id}")
+                print(f"❌ Transmission Dropped Mahatenders Group 1: {t_id}")
 
-    # 3. Safe Merge State Sync Matrix
+    # 3. Run Mahatenders Core Extraction
+    mahatenders_group_2_pending = {}
+    check_mahatenders(mahatenders_group_2_pending, {**archive_dict, **new_found_this_run}, MAHATENDERS_GROUP_2)
+    
+    for dist, tenders in mahatenders_group_2_pending.items():
+        unique_tenders = [t for t in tenders if t[0] not in sent_in_this_run]
+        if not unique_tenders: continue
+        
+        # Broadcast WhatsApp Group District Header
+        header = f"🏙️ *DISTRICT: {dist.upper()}*"
+        print(header)
+        send_whatsapp(header, WA_GROUP_MAHATENDERS_2)
+        apply_global_delay()
+        
+        for t_id, new_date, msg in unique_tenders:
+            if send_whatsapp(msg, WA_GROUP_MAHATENDERS_2):
+                new_found_this_run[t_id] = new_date
+                sent_in_this_run.add(t_id)
+                print(f"✅ Transmitted to Mahatenders Group 2: {t_id}")
+                apply_global_delay()
+            else:
+                print(f"❌ Transmission Dropped Mahatenders 2: {t_id}")
+
+    # 4. Safe Merge State Sync Matrix
     if new_found_this_run:
         final_archive = {**archive_dict, **new_found_this_run}
         save_archive(final_archive)
