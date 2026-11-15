@@ -332,40 +332,43 @@ def fetch_mahatender_details(session, detail_url):
         return details
     except: return {'amount': 'Not Specified', 'fee': 'Not Specified', 'emd': 'Not Specified'}
 
-def check_mahatenders(pending_msgs, archive):
-    print(f"[{time.strftime('%H:%M:%S')}] Checking Mahatenders Search...")
 
-    url = "https://mahatenders.gov.in/nicgep/app"
+def check_mahatenders(pending_msgs, archive, district_data):
+    print(f"[{datetime.now(IST).strftime('%H:%M:%S')}] Initializing Mahatenders District + Taluka Search...")
+
     s = requests.Session()
-    s.headers.update({'User-Agent': 'Mozilla/5.0'})
+    s.headers.update({
+        'User-Agent': 'Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/119.0'
+    })
 
-    # Prevent the same tender from being added multiple times
-    # when it appears in district and multiple taluka searches.
+    # Prevent duplicate tenders when the same tender appears
+    # in both district and taluka search results.
     seen_tender_ids = set()
 
-    # Process one district completely before moving to the next.
-    for dist_name, talukas in DISTRICT_DATA.items():
+    for dist_name, talukas in district_data.items():
 
-        print(f"\n{'='*50}")
-        print(f"🏙️ DISTRICT: {dist_name}")
-        print(f"{'='*50}")
+        print(f"\n🏙️ Searching District: {dist_name}")
 
-        # Search district first, followed by every taluka.
-        # dict.fromkeys removes duplicate search terms while
-        # preserving their original order.
+        # Search district first, then every taluka
         search_terms = list(dict.fromkeys([dist_name] + talukas))
 
         for search_term in search_terms:
 
-            print(f"🔍 Searching: {search_term}")
+            print(f"   🔍 Searching: {search_term}")
 
             try:
-                r = s.get(url, verify=False, timeout=20)
-                soup = BeautifulSoup(r.text, 'html.parser')
+                # Load the search page and obtain form values
+                r = s.get(
+                    MAHATENDERS_BASE_URL,
+                    verify=False,
+                    timeout=20
+                )
 
+                soup = BeautifulSoup(r.text, 'html.parser')
                 form = soup.find('form', id='tenderSearch')
+
                 if not form:
-                    print(f"⚠️ Search form not found: {search_term}")
+                    print(f"   ⚠️ Search form not found for {search_term}")
                     continue
 
                 data = {
@@ -374,6 +377,7 @@ def check_mahatenders(pending_msgs, archive):
                     if inp.get('name')
                 }
 
+                # Search using the current district/taluka
                 data['SearchDescription'] = search_term
                 data['Go'] = 'Go'
 
@@ -388,43 +392,38 @@ def check_mahatenders(pending_msgs, archive):
                 table = res_soup.find('table', id='table')
 
                 if not table:
-                    print(f"ℹ️ No results table: {search_term}")
+                    print(f"   ℹ️ No tender table found for {search_term}")
                     continue
 
+                # Process tender rows
                 for row in table.find_all('tr')[1:]:
 
                     cols = row.find_all('td')
+
                     if len(cols) < 6:
                         continue
 
                     title = cols[4].text.strip()
-                    current_close_date = cols[2].text.strip()
+                    current_close_date = normalize_date_str(
+                        cols[2].text.strip()
+                    )
 
                     id_match = re.search(
-                        r'\d{4}\_[A-Z]+\_\d+\_\d+',
+                        r'\d{4}_[A-Z]+_\d+_\d+',
                         title
                     )
 
-                    t_id = id_match.group(0) if id_match else title[:50]
+                    t_id = (
+                        id_match.group(0)
+                        if id_match
+                        else title[:50].strip()
+                    )
 
-                    # Avoid duplicate tender entries across searches.
-                    if t_id in seen_tender_ids:
+                    if not t_id:
                         continue
 
-                    # Existing archive checking logic
-                    is_updated = False
-
-                    if t_id in archive:
-                        if is_same_date(
-                            archive.get(t_id),
-                            current_close_date
-                        ):
-                            seen_tender_ids.add(t_id)
-                            continue
-                        else:
-                            is_updated = True
-
-                    # Existing district and taluka matching logic
+                    # Check whether tender belongs to this district
+                    # or one of its configured talukas.
                     combined = title.lower()
 
                     matched, matched_taluka = get_matched_district_taluka(
@@ -433,65 +432,83 @@ def check_mahatenders(pending_msgs, archive):
                         talukas
                     )
 
-                    if matched:
+                    if not matched:
+                        continue
 
-                        link = cols[4].find('a')
+                    # Avoid processing the same tender again
+                    # from another district/taluka search.
+                    if t_id in seen_tender_ids:
+                        continue
 
-                        detail_url = (
-                            link.get('href')
-                            if link else None
-                        )
+                    seen_tender_ids.add(t_id)
 
-                        extra = fetch_mahatender_details(
-                            s,
-                            detail_url
-                        )
+                    # Check archive for new or updated tenders
+                    is_updated = False
 
+                    if t_id in archive:
+
+                        if is_same_date(
+                            archive.get(t_id),
+                            current_close_date
+                        ):
+                            continue
+
+                        else:
+                            is_updated = True
+
+                    # Fetch detailed tender information
+                    tender_link = cols[4].find('a')
+
+                    detail_url = (
+                        tender_link.get('href')
+                        if tender_link
+                        else None
+                    )
+
+                    extra = fetch_mahatender_details(
+                        s,
+                        detail_url
+                    )
+
+                    # Prepare WhatsApp message
+                    msg = (
+                        f"🏷️ Division: {matched_taluka}\n"
+                        f"🔢 Tender ID: *{t_id}*\n"
+                        f"📝 Title: {title}\n"
+                        f"📅 Published Date: {normalize_date_str(cols[1].text.strip())}\n"
+                        f"⌛ Closing Date: {current_close_date}\n"
+                        f"⚙️ Opening Date: {normalize_date_str(cols[3].text.strip())}\n"
+                        f"💰 Tender Amount: {extra['amount']}\n"
+                        f"💳 EMD Amount: {extra['emd']}\n"
+                        f"📜 Tender Fee: {extra['fee']}\n"
+                        f"🏢 Organisation: {cols[5].text.strip()}"
+                    )
+
+                    if is_updated:
                         msg = (
-                            f"🏷️ Division: {matched_taluka}\n"
-                            f"🔢 Tender ID: `{t_id}`\n"
-                            f"📝 Title: {title}\n"
-                            f"📅 Published Date: {normalize_date_str(cols[1].text.strip())}\n"
-                            f"⌛ Closing Date: {normalize_date_str(current_close_date)}\n"
-                            f"⚙️ Opening Date: {normalize_date_str(cols[3].text.strip())}\n"
-                            f"💰 Tender Amount: {extra['amount']}\n"
-                            f"💳 EMD Amount: {extra['emd']}\n"
-                            f"📜 Tender Fee: {extra['fee']}\n"
-                            f"🏢 Organisation: {cols[5].text.strip()}"
-                        )
+                            f"🔄 *UPDATED / REFLOATED TENDER* 🔄\n"
+                            f"_(Previous Date: {archive.get(t_id)})_\n\n"
+                        ) + msg
 
-                        if is_updated:
-                            msg = (
-                                f"🔄 **UPDATED / REFLOATED TENDER** 🔄\n"
-                                f"*(Previous Date: {archive.get(t_id)})*\n\n"
-                            ) + msg
+                    pending_msgs.setdefault(
+                        dist_name,
+                        []
+                    ).append(
+                        (t_id, current_close_date, msg)
+                    )
 
-                        pending_msgs.setdefault(
-                            dist_name, []
-                        ).append(
-                            (
-                                t_id,
-                                current_close_date,
-                                msg,
-                                is_updated,
-                                title
-                            )
-                        )
-
-                        seen_tender_ids.add(t_id)
-
-                        print(f"✅ Tender Found: {t_id}")
+                    print(
+                        f"   ✅ Found tender: {t_id} "
+                        f"under search term: {search_term}"
+                    )
 
             except Exception as e:
                 print(
-                    f"❌ Error searching {search_term} "
-                    f"under {dist_name}: {e}"
+                    f"⚠️ Error searching {search_term} "
+                    f"under district {dist_name}: {e}"
                 )
                 continue
 
-        print(f"✅ Completed all searches for {dist_name}")
-
-    print("\n🏁 Completed all district and taluka searches.")
 
 # --- RUN ENGINE ---
 def job():
